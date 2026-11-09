@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ketha Kumara Sriram — Strategy & Revenue Operations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
+
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:          #07070d;
+  --bg2:         #0c0c17;
+  --surface:     #12121e;
+  --surface2:    #1a1a2a;
+  --border:      rgba(255,255,255,0.09);
+  --border2:     rgba(255,255,255,0.05);
+  --text:        #f0ede6;
+  --text2:       #c8c4bc;
+  --muted:       #8a8680;
+  --text-inv:    #07070d;
+  --gold:        #c9a96e;
+  --gold-light:  #e8cfa0;
+  --mint:        #6ec9a4;
+  --peach:       #e8a070;
+  --lav:         #b09cd0;
+  --sky:         #70b4d8;
+  --ca:          1;
+  --blob-op:     0;
+  --line-color:  rgba(255,255,255,0.06);
+}
+[data-theme="light"] {
+  --bg:          #faf8f4;
+  --bg2:         #f3f0e8;
+  --surface:     #ede9e0;
+  --surface2:    #e5e0d5;
+  --border:      rgba(0,0,0,0.09);
+  --border2:     rgba(0,0,0,0.05);
+  --text:        #0d0c09;
+  --text2:       #2a2824;
+  --muted:       #5c5850;
+  --text-inv:    #faf8f4;
+  --gold:        #8b6914;
+  --gold-light:  #b08030;
+  --mint:        #1a6e48;
+  --peach:       #a04820;
+  --lav:         #5030a0;
+  --sky:         #1850a0;
+  --ca:          0.28;
+  --blob-op:     1;
+  --line-color:  rgba(0,0,0,0.05);
+}
+
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-snap-type:y mandatory; overflow-y:scroll; scroll-behavior:smooth; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  transition:background .5s,color .5s;
+}
+@media(hover:hover){ body { cursor:none; } }
+#cur,#cur2 { display:none; }
+@media(hover:hover){
+  #cur  { display:block;position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;left:0;top:0;transition:width .2s,height .2s,background .3s; }
+  #cur2 { display:block;position:fixed;width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9998;left:0;top:0;opacity:.5;transition:border-color .3s; }
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE AMBIENT BLOBS
+═══════════════════════════════════════════ */
+#blobs {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  opacity:var(--blob-op); transition:opacity .5s;
+}
+.blob {
+  position:absolute; border-radius:50%;
+  filter:blur(80px);
+  animation:blobdrift 18s ease-in-out infinite alternate;
+}
+.blob1 { width:500px;height:500px;background:radial-gradient(circle,rgba(110,201,164,0.18),transparent 70%);top:-100px;left:-100px;animation-duration:20s; }
+.blob2 { width:600px;height:600px;background:radial-gradient(circle,rgba(201,169,110,0.14),transparent 70%);top:30%;right:-150px;animation-duration:25s;animation-delay:-8s; }
+.blob3 { width:450px;height:450px;background:radial-gradient(circle,rgba(176,156,208,0.15),transparent 70%);bottom:10%;left:20%;animation-duration:22s;animation-delay:-4s; }
+.blob4 { width:350px;height:350px;background:radial-gradient(circle,rgba(112,180,216,0.13),transparent 70%);top:60%;right:10%;animation-duration:28s;animation-delay:-12s; }
+@keyframes blobdrift {
+  0%   { transform:translate(0,0) scale(1); }
+  33%  { transform:translate(40px,-30px) scale(1.08); }
+  66%  { transform:translate(-20px,50px) scale(0.95); }
+  100% { transform:translate(30px,20px) scale(1.04); }
+}
+
+/* DARK MODE CANVAS */
+canvas#c { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--ca);transition:opacity .5s; }
+
+/* LIGHT MODE SVG MESH LINES */
+#mesh { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--blob-op);transition:opacity .5s; }
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:1.2rem 5vw;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:background .5s,backdrop-filter .5s,border-color .5s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled {
+  background:rgba(7,7,13,0.9);
+  backdrop-filter:blur(24px);
+  border-bottom-color:var(--border);
+}
+[data-theme="light"] nav.scrolled {
+  background:rgba(250,248,244,0.92);
+}
+.nav-logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-weight:600;letter-spacing:.08em;
+  color:var(--text);text-decoration:none;cursor:none;
+  font-style:italic;
+}
+.nav-right { display:flex;align-items:center;gap:2rem; }
+.nav-links { display:flex;gap:2rem; }
+.nav-links a {
+  font-family:'DM Sans',sans-serif;
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;cursor:none;
+  transition:color .3s;
+}
+.nav-links a:hover { color:var(--text); }
+#tbtn {
+  background:none;border:1px solid var(--border);
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;font-size:.95rem;
+  transition:border-color .3s,transform .4s;
+}
+#tbtn:hover { border-color:var(--gold);transform:rotate(20deg); }
+.i-moon{display:block}.i-sun{display:none}
+[data-theme="light"] .i-moon{display:none}
+[data-theme="light"] .i-sun{display:block}
+@media(max-width:640px){
+  nav{padding:1rem 4vw}
+  .nav-links{gap:1.2rem}
+  .nav-links a{font-size:.58rem;letter-spacing:.1em}
+  .nav-logo{font-size:.95rem}
+}
+
+/* ═══════════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════════ */
+.snap { scroll-snap-align:start;min-height:100svh;position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:10vh 5vw; }
+.snap.free { scroll-snap-align:none;min-height:auto;padding:8vh 5vw; }
+
+.label-tag {
+  font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;
+}
+.label-tag::before { content:'';width:2.5rem;height:1px;background:var(--gold);flex-shrink:0; }
+
+/* ═══════════════════════════════════════════
+   REVEAL
+═══════════════════════════════════════════ */
+.rev { opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.16,1,.3,1); }
+.rev.on { opacity:1;transform:translateY(0); }
+.d1{transition-delay:.08s}.d2{transition-delay:.17s}.d3{transition-delay:.26s}.d4{transition-delay:.35s}.d5{transition-delay:.44s}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#s0 { gap:2.4rem;padding-top:16vh; }
+
+.hero-eyebrow {
+  font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:1.2rem;
+  opacity:0;animation:rise .9s .2s forwards;
+}
+.hero-eyebrow::before { content:'';width:2.8rem;height:1px;background:var(--gold);flex-shrink:0; }
+
+.hero-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.8rem,12vw,11rem);
+  font-weight:300;line-height:.88;letter-spacing:-.01em;
+  opacity:0;animation:rise 1.1s .35s forwards;
+}
+.hero-name .em { font-style:italic;color:var(--gold);display:block; }
+.hero-name .surname { display:block;color:var(--text); }
+
+.hero-rule {
+  width:5rem;height:1px;
+  background:linear-gradient(to right,var(--gold),transparent);
+  opacity:0;animation:rise .8s .55s forwards;
+}
+
+.hero-tagline {
+  max-width:680px;
+  opacity:0;animation:rise 1s .65s forwards;
+}
+.hero-tagline p {
+  font-family:'EB Garamond',serif;
+  font-size:clamp(1.1rem,2.4vw,1.45rem);
+  line-height:1.8;color:var(--text2);font-style:italic;
+}
+.hero-tagline p strong { font-style:normal;color:var(--text);font-weight:500; }
+
+.hero-sub {
+  max-width:640px;
+  opacity:0;animation:rise 1s .8s forwards;
+}
+.hero-sub p {
+  font-size:clamp(.88rem,1.8vw,1rem);
+  line-height:2;color:var(--muted);
+}
+
+/* CYCLE */
+.cycle-wrap{display:inline-block;overflow:hidden;vertical-align:bottom;height:1.12em}
+.cycle-inner{display:flex;flex-direction:column;animation:cycle 10s steps(1) infinite}
+.cycle-inner span{height:1.12em;line-height:1.12;white-space:nowrap;color:var(--mint);font-style:normal;font-weight:500}
+
+.hero-cta {
+  display:flex;gap:1.2rem;flex-wrap:wrap;
+  opacity:0;animation:rise 1s 1s forwards;
+}
+.btn {
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.85rem 2rem;
+  font-family:'DM Sans',sans-serif;
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;cursor:none;border:none;
+  transition:all .3s ease;
+}
+.btn.primary { background:var(--gold);color:var(--text-inv);font-weight:500; }
+.btn.primary:hover { background:var(--peach);transform:translateY(-2px); }
+.btn.ghost { border:1px solid var(--border);color:var(--muted);background:transparent; }
+.btn.ghost:hover { border-color:var(--text);color:var(--text); }
+
+.scroll-hint {
+  position:absolute;bottom:2.5rem;left:5vw;
+  display:flex;align-items:center;gap:.9rem;
+  font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);
+  opacity:0;animation:rise 1s 1.3s forwards;
+}
+.scroll-bar{width:1px;height:2.8rem;background:linear-gradient(to bottom,transparent,var(--gold));animation:pulse 2s infinite}
+
+/* ═══════════════════════════════════════════
+   MARQUEE
+═══════════════════════════════════════════ */
+.mstrip {
+  overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:.9rem 0;background:var(--bg2);position:relative;z-index:2;transition:background .5s;
+}
+.minner { display:flex;width:max-content;animation:marq 32s linear infinite; }
+.mitem {
+  font-family:'DM Sans',sans-serif;font-size:.62rem;font-weight:300;
+  letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;
+  padding:0 2.5rem;color:var(--muted);
+  display:flex;align-items:center;gap:2.5rem;
+}
+.mdot { width:3px;height:3px;border-radius:50%;background:var(--gold);flex-shrink:0; }
+
+/* ═══════════════════════════════════════════
+   WHAT I BUILD — LANDING SECTION
+═══════════════════════════════════════════ */
+#s-build { gap:0; }
+.build-intro { margin-bottom:5rem; }
+.build-headline {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,5vw,5.5rem);
+  font-weight:300;line-height:1.05;
+}
+.build-headline em { font-style:italic;color:var(--gold); }
+.build-desc {
+  margin-top:1.8rem;max-width:600px;
+  font-size:clamp(.9rem,1.8vw,1.05rem);line-height:2;color:var(--muted);
+}
+.build-desc strong { color:var(--text);font-weight:500; }
+
+/* BUILD CARDS — 3 column */
+.build-grid {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+}
+@media(max-width:900px){.build-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.build-grid{grid-template-columns:1fr}}
+
+.bc {
+  background:var(--bg);padding:2.2rem 2rem;
+  transition:background .35s;
+  position:relative;overflow:hidden;
+}
+.bc::after {
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--gold),transparent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.bc:hover { background:var(--surface); }
+.bc:hover::after { transform:scaleX(1); }
+
+.bc-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:300;color:var(--border);
+  line-height:1;margin-bottom:1.2rem;
+  transition:color .3s;
+}
+.bc:hover .bc-num { color:var(--gold); }
+.bc-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;font-weight:600;color:var(--text);
+  margin-bottom:.8rem;line-height:1.2;
+}
+.bc-body { font-size:.82rem;line-height:1.9;color:var(--muted); }
+.bc-body strong { color:var(--text2);font-weight:500; }
+
+/* ═══════════════════════════════════════════
+   ABOUT — EDITORIAL SPLIT
+═══════════════════════════════════════════ */
+#s1 { gap:0; }
+.about-grid {
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:7vw;align-items:start;width:100%;
+}
+@media(max-width:820px){.about-grid{grid-template-columns:1fr;gap:3rem}}
+
+.about-sticky { position:sticky;top:22vh; }
+.about-hl {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,4rem);
+  font-weight:300;line-height:1.15;
+}
+.about-hl em { font-style:italic;color:var(--lav); }
+.about-rule { width:3rem;height:1px;background:var(--gold);margin:1.5rem 0; }
+
+.about-right { display:flex;flex-direction:column;gap:0; }
+.about-block {
+  padding:2rem 0;border-bottom:1px solid var(--border);
+}
+.about-block:last-child { border-bottom:none; }
+.ab-label { font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem; }
+.ab-text { font-size:clamp(.88rem,1.7vw,1rem);line-height:2.05;color:var(--muted); }
+.ab-text strong { color:var(--text);font-weight:500; }
+
+.stats-row {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;
+}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.stats-row .stat:last-child{grid-column:1/-1}}
+.stat {
+  background:var(--surface);border:1px solid var(--border);
+  padding:1.5rem 1.2rem;
+  transition:border-color .3s,transform .35s cubic-bezier(.16,1,.3,1);
+}
+.stat:hover { border-color:var(--gold);transform:translateY(-3px); }
+.stn {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3rem);font-weight:300;line-height:1;
+}
+.stl { font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.4rem; }
+.stat:nth-child(1) .stn{color:var(--mint)}
+.stat:nth-child(2) .stn{color:var(--peach)}
+.stat:nth-child(3) .stn{color:var(--lav)}
+
+/* ═══════════════════════════════════════════
+   EXPERIENCE TIMELINE
+═══════════════════════════════════════════ */
+#s2 { padding-top:8vh;padding-bottom:8vh; }
+.work-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.5rem,7vw,7.5rem);
+  font-weight:300;line-height:.92;margin-bottom:4rem;
+}
+.work-title em { font-style:italic;color:var(--peach); }
+
+.timeline { position:relative; }
+.timeline::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--border) 5%,var(--border) 95%,transparent);
+}
+.ti {
+  padding:2.2rem 0 2.2rem 2.8rem;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.ti:last-child{border-bottom:none}
+.ti::before {
+  content:'';position:absolute;left:-5px;top:2.6rem;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--border);
+  transition:border-color .3s,box-shadow .3s;
+}
+.ti:hover::before { border-color:var(--gold);box-shadow:0 0 10px rgba(201,169,110,.4); }
+
+.ti-period { font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem; }
+.ti-role {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.2rem,2.6vw,1.8rem);
+  font-weight:600;margin-bottom:.2rem;line-height:1.2;
+}
+.ti-co { font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1.4rem; }
+.ti-pts { list-style:none;display:flex;flex-direction:column;gap:.55rem; }
+.ti-pts li {
+  font-size:clamp(.84rem,1.7vw,.97rem);
+  line-height:1.9;color:var(--muted);
+  display:flex;gap:.9rem;align-items:flex-start;
+}
+.ti-pts li::before { content:'—';color:var(--gold);flex-shrink:0;margin-top:2px; }
+.ti-pts li strong { color:var(--text);font-weight:500; }
+
+/* ═══════════════════════════════════════════
+   HOW I WORK — PROCESS SECTION
+═══════════════════════════════════════════ */
+#s-process { padding-top:8vh;padding-bottom:8vh; }
+.process-header { margin-bottom:4rem; }
+.process-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,5.5vw,5.5rem);
+  font-weight:300;line-height:1;
+}
+.process-title em { font-style:italic;color:var(--mint); }
+
+.process-grid {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+}
+@media(max-width:900px){.process-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.process-grid{grid-template-columns:1fr}}
+
+.pg {
+  background:var(--bg);padding:2rem 1.8rem;
+  display:flex;flex-direction:column;gap:.8rem;
+  transition:background .3s;
+}
+.pg:hover { background:var(--surface); }
+.pg-step {
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.5rem;font-weight:300;color:var(--border);
+  transition:color .3s;line-height:1;
+}
+.pg:hover .pg-step { color:var(--gold); }
+.pg-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.15rem;font-weight:600;color:var(--text);
+}
+.pg-body { font-size:.8rem;line-height:1.9;color:var(--muted); }
+
+/* ═══════════════════════════════════════════
+   SKILLS
+═══════════════════════════════════════════ */
+#s3 { padding-top:8vh;padding-bottom:8vh; }
+.skills-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.5rem,7vw,7.5rem);
+  font-weight:300;line-height:.92;margin-bottom:3rem;
+}
+.skills-title em { font-style:italic;color:var(--sky); }
+
+.smain {
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--border);border:1px solid var(--border);
+}
+@media(max-width:680px){.smain{grid-template-columns:1fr}}
+
+.scat { background:var(--bg);padding:2rem;transition:background .3s; }
+.scat:hover { background:var(--surface); }
+.scn { font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem; }
+.spills { display:flex;flex-wrap:wrap;gap:.5rem; }
+.sp {
+  font-family:'DM Sans',sans-serif;
+  font-size:.73rem;padding:.42rem 1rem;
+  border:1px solid var(--border);color:var(--muted);cursor:none;
+  transition:all .25s;
+}
+.sp:hover { border-color:var(--gold);color:var(--text); }
+
+.tools-sec { margin-top:2.5rem; }
+.tgrid { display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem; }
+.tcard {
+  background:var(--surface);border:1px solid var(--border);
+  padding:1rem 1.1rem;transition:border-color .3s,transform .3s;
+}
+.tcard:hover { border-color:var(--sky);transform:translateY(-2px); }
+.tname { font-size:.8rem;color:var(--text);margin-bottom:.2rem;font-weight:500; }
+.ttype { font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted); }
+
+.certs-sec { margin-top:2.5rem; }
+.cgrid { display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.7rem; }
+.ccard {
+  background:var(--surface);border:1px solid var(--border);
+  padding:1.2rem 1.3rem;display:flex;align-items:flex-start;gap:1rem;
+  transition:border-color .3s;
+}
+.ccard:hover { border-color:var(--lav); }
+.cico { font-size:1.25rem;flex-shrink:0;margin-top:.1rem; }
+.cname { font-size:.82rem;color:var(--text);margin-bottom:.2rem;font-weight:500; }
+.cby { font-size:.64rem;letter-spacing:.1em;color:var(--muted); }
+
+/* ═══════════════════════════════════════════
+   CONTACT
+═══════════════════════════════════════════ */
+#s4 { text-align:center;align-items:center;gap:2.5rem;position:relative;overflow:hidden; }
+#s4::before {
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,169,110,0.06),transparent 65%);
+  pointer-events:none;
+}
+
+.cta-tag {
+  font-size:.62rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:1.2rem;
+}
+.cta-tag::before,.cta-tag::after{content:'';width:2.5rem;height:1px;background:var(--gold)}
+
+.cta-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,11vw,10rem);
+  font-weight:300;line-height:.88;letter-spacing:-.01em;
+}
+.cta-title em { font-style:italic;color:var(--gold);display:block; }
+
+.cta-sub {
+  font-family:'EB Garamond',serif;
+  font-size:clamp(1rem,2vw,1.25rem);
+  font-style:italic;line-height:1.85;color:var(--text2);max-width:520px;
+}
+.cta-sub strong { font-style:normal;color:var(--text);font-weight:500; }
+
+.cta-btns { display:flex;gap:1rem;flex-wrap:wrap;justify-content:center; }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  position:relative;z-index:2;padding:2rem 5vw;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:1rem;background:var(--bg2);transition:background .5s;
+}
+footer p { font-size:.62rem;letter-spacing:.1em;color:var(--muted); }
+footer span { color:var(--gold); }
+
+/* ═══════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════ */
+@keyframes rise{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cycle{
+  0%,23%{transform:translateY(0)}
+  25%,48%{transform:translateY(-1.12em)}
+  50%,73%{transform:translateY(-2.24em)}
+  75%,98%{transform:translateY(-3.36em)}
+  100%{transform:translateY(0)}
+}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- LIGHT MODE BLOBS -->
+<div id="blobs">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+</div>
+
+<!-- DARK MODE CANVAS -->
+<canvas id="c"></canvas>
+
+<!-- ════════════════════════════════════
+     NAV
+════════════════════════════════════ -->
+<nav id="nav">
+  <a class="nav-logo" href="#">KS</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="#s-build">Services</a>
+      <a href="#s1">About</a>
+      <a href="#s2">Experience</a>
+      <a href="#s3">Skills</a>
+      <a href="#s4">Contact</a>
+    </div>
+    <button id="tbtn" aria-label="Toggle theme">
+      <span class="i-moon">🌙</span>
+      <span class="i-sun">☀️</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════
+     HERO
+════════════════════════════════════ -->
+<section class="snap" id="s0">
+  <div class="hero-eyebrow">Strategy &amp; Revenue Operations · Bengaluru, India</div>
+
+  <h1 class="hero-name">
+    <em>Kumara Sriram</em>
+    <span class="surname">Ketha</span>
+  </h1>
+
+  <div class="hero-rule"></div>
+
+  <div class="hero-tagline">
+    <p>
+      The operator who makes companies <span class="cycle-wrap"><span class="cycle-inner">
+        <span>scale.</span><span>compound.</span><span>win.</span><span>work.</span>
+      </span></span><br>
+      <strong>Revenue Architecture. Strategic Operations. 0 to 1 Execution.</strong>
+    </p>
+  </div>
+
+  <div class="hero-sub">
+    <p>
+      Five years building the systems behind <strong>120% revenue growth</strong> — from custom CRMs and pipeline infrastructure to board-level strategy. I don't just advise. I build and ship.
+    </p>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#s4" class="btn primary">Engage Me ↗</a>
+    <a href="#s-build" class="btn ghost">What I Build</a>
+    <a href="#s2" class="btn ghost">Experience</a>
+  </div>
+
+  <div class="scroll-hint"><div class="scroll-bar"></div>Scroll to explore</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mstrip">
+  <div class="minner">
+    <span class="mitem">Revenue Architecture<span class="mdot"></span></span>
+    <span class="mitem">Chief of Staff<span class="mdot"></span></span>
+    <span class="mitem">CRM Design &amp; Build<span class="mdot"></span></span>
+    <span class="mitem">Founder's Office<span class="mdot"></span></span>
+    <span class="mitem">Go-to-Market Strategy<span class="mdot"></span></span>
+    <span class="mitem">Business Scaling<span class="mdot"></span></span>
+    <span class="mitem">0→1 Expansion<span class="mdot"></span></span>
+    <span class="mitem">ISO 27001<span class="mdot"></span></span>
+    <span class="mitem">Revenue Architecture<span class="mdot"></span></span>
+    <span class="mitem">Chief of Staff<span class="mdot"></span></span>
+    <span class="mitem">CRM Design &amp; Build<span class="mdot"></span></span>
+    <span class="mitem">Founder's Office<span class="mdot"></span></span>
+    <span class="mitem">Go-to-Market Strategy<span class="mdot"></span></span>
+    <span class="mitem">Business Scaling<span class="mdot"></span></span>
+    <span class="mitem">0→1 Expansion<span class="mdot"></span></span>
+    <span class="mitem">ISO 27001<span class="mdot"></span></span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     WHAT I BUILD — THE LANDING SECTION
+════════════════════════════════════ -->
+<section class="snap free" id="s-build">
+  <div class="build-intro">
+    <div class="label-tag rev">What I Build</div>
+    <h2 class="build-headline rev d1">
+      Not a consultant who <em>presents.</em><br>
+      An operator who <em>delivers.</em>
+    </h2>
+    <p class="build-desc rev d2">
+      I sit at the intersection of strategy, systems, and execution. Whether you're a <strong>Series A scaling fast</strong>, a <strong>founder drowning in operational chaos</strong>, or a <strong>CEO who needs a trusted operator beside them</strong> — here's what I actually build.
+    </p>
+  </div>
+
+  <div class="build-grid">
+
+    <div class="bc rev">
+      <div class="bc-num">01</div>
+      <div class="bc-title">Revenue Systems &amp; CRM Architecture</div>
+      <div class="bc-body">
+        I build <strong>custom CRMs from scratch</strong> — not just implementations. Full pipeline logic, lead routing, deal stages, renewal workflows, and reporting dashboards. Built two live, production CRMs on Airtable. I design the whole revenue motion: <strong>who owns what, when, and how it gets measured</strong>.
+      </div>
+    </div>
+
+    <div class="bc rev d1">
+      <div class="bc-num">02</div>
+      <div class="bc-title">Business Scaling Infrastructure</div>
+      <div class="bc-body">
+        I build the operational backbone that lets a company grow without breaking. <strong>SOPs, process maps, org design, cross-functional playbooks</strong>, and decision frameworks that remove founders from every bottleneck. The kind of infrastructure McKinsey would charge ₹2Cr to design — I build it and run it.
+      </div>
+    </div>
+
+    <div class="bc rev d2">
+      <div class="bc-num">03</div>
+      <div class="bc-title">Go-to-Market &amp; Revenue Strategy</div>
+      <div class="bc-body">
+        From <strong>0-1 market entry to enterprise deal strategy</strong> — I design the full GTM motion. ICP definition, channel architecture, pricing frameworks, partnership structures, and international expansion roadmaps. Backed by data, built for execution.
+      </div>
+    </div>
+
+    <div class="bc rev d1">
+      <div class="bc-num">04</div>
+      <div class="bc-title">Churn, Retention &amp; Upsell Engines</div>
+      <div class="bc-body">
+        I build <strong>customer health scoring models, early churn warning dashboards</strong>, and intervention playbooks that turn at-risk accounts into advocates. Then layer in <strong>systematic upsell and cross-sell programmes</strong> that expand revenue from your existing base — not just new logos.
+      </div>
+    </div>
+
+    <div class="bc rev d2">
+      <div class="bc-num">05</div>
+      <div class="bc-title">Compliance &amp; Governance Frameworks</div>
+      <div class="bc-body">
+        <strong>ISO 27001 implementation, contract &amp; NDA management, vendor compliance, legal risk advisory</strong> — I've built these from scratch. Full policy suites, risk registers, audit frameworks, and staff training that actually hold up when scrutinised. Built to protect the business, not just tick boxes.
+      </div>
+    </div>
+
+    <div class="bc rev d3">
+      <div class="bc-num">06</div>
+      <div class="bc-title">Data, Analytics &amp; Decision Intelligence</div>
+      <div class="bc-body">
+        I turn raw operational data into <strong>boardroom-ready intelligence</strong> using SQL, Python, R, and Tableau. Revenue dashboards, pipeline forecasts, cohort analyses, churn models, and performance reporting that CEOs and investors actually use to make decisions — not decks that gather dust.
+      </div>
+    </div>
+
+    <div class="bc rev d2">
+      <div class="bc-num">07</div>
+      <div class="bc-title">Founder's Office &amp; Chief of Staff</div>
+      <div class="bc-body">
+        I operate as a <strong>force multiplier for CEOs and Founders</strong> — owning the things that matter most but fall through the cracks. Strategic planning, investor reporting, board prep, cross-functional alignment, and whatever else needs to get done. I bring <strong>structure to ambiguity</strong> and execution to vision.
+      </div>
+    </div>
+
+    <div class="bc rev d3">
+      <div class="bc-num">08</div>
+      <div class="bc-title">AI Workflow Design &amp; Automation</div>
+      <div class="bc-body">
+        I design and deploy <strong>AI-powered operational workflows</strong> that eliminate manual overhead across sales, ops, and admin. From prompt engineering to tool integration — I've led AI adoption programmes that measurably compressed execution timelines across organisations.
+      </div>
+    </div>
+
+    <div class="bc rev d4">
+      <div class="bc-num">09</div>
+      <div class="bc-title">HR, TA &amp; People Operations</div>
+      <div class="bc-body">
+        Built <strong>end-to-end HR and Talent Acquisition SOPs</strong> that let companies hire and onboard without founders in every loop. Role frameworks, interview structures, onboarding playbooks, and performance review systems — the people infrastructure that makes scaling human.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     HOW I WORK
+════════════════════════════════════ -->
+<section class="snap free" id="s-process">
+  <div class="process-header">
+    <div class="label-tag rev">How I Work</div>
+    <h2 class="process-title rev d1">The operating <em>method.</em></h2>
+  </div>
+  <div class="process-grid">
+    <div class="pg rev">
+      <div class="pg-step">01</div>
+      <div class="pg-title">Diagnose</div>
+      <div class="pg-body">I start with the business, not the brief. Stakeholder interviews, data pulls, process mapping — understand where the actual leverage is before touching anything.</div>
+    </div>
+    <div class="pg rev d1">
+      <div class="pg-step">02</div>
+      <div class="pg-title">Design</div>
+      <div class="pg-body">Build the system architecture — CRM flows, process logic, compliance frameworks, revenue models — grounded in data and designed to survive contact with reality.</div>
+    </div>
+    <div class="pg rev d2">
+      <div class="pg-step">03</div>
+      <div class="pg-title">Deploy</div>
+      <div class="pg-body">Ship it. Not a deck, not a recommendation — a live, running system. I stay in the build until it's in production and the team is using it.</div>
+    </div>
+    <div class="pg rev d3">
+      <div class="pg-step">04</div>
+      <div class="pg-title">Optimise</div>
+      <div class="pg-body">Measure what matters. Iterate on what's working. Kill what isn't. Build the dashboards that keep leadership honest and the business improving quarter over quarter.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     ABOUT
+════════════════════════════════════ -->
+<section class="snap" id="s1">
+  <div class="label-tag rev">About</div>
+  <div class="about-grid">
+
+    <div class="about-sticky">
+      <h2 class="about-hl rev d1">Strategy<br>meets <em>execution.</em></h2>
+      <div class="about-rule rev d2"></div>
+      <div class="stats-row">
+        <div class="stat rev d2"><div class="stn">120%</div><div class="stl">Revenue Growth Driven</div></div>
+        <div class="stat rev d3"><div class="stn">2</div><div class="stl">Custom CRMs Built</div></div>
+        <div class="stat rev d4"><div class="stn">5+</div><div class="stl">Years at CEO Level</div></div>
+      </div>
+    </div>
+
+    <div class="about-right">
+      <div class="about-block rev d1">
+        <div class="ab-label">The Background</div>
+        <p class="ab-text">Five years operating at <strong>CEO and Board level</strong> across fintech and early-stage tech in Bengaluru. I've been the person who builds the things that make companies scale — not the person who writes the report about what should be built.</p>
+      </div>
+      <div class="about-block rev d2">
+        <div class="ab-label">The Differentiator</div>
+        <p class="ab-text">I've built <strong>two fully custom CRMs from scratch on Airtable</strong> — both deployed live in production organisations. Most operators use tools. I architect them. My technical stack (SQL, Python, R, SPSS, Tableau) means I don't need a data team to answer a data question.</p>
+      </div>
+      <div class="about-block rev d3">
+        <div class="ab-label">The Education</div>
+        <p class="ab-text"><strong>MBA in Business Analytics. </strong> Certified in Google Project Management, Certified Agile Practitioner, and ISO 27001 Lead Implementer — not as credentials to display, but as frameworks I actually use.</p>
+      </div>
+      <div class="about-block rev d4">
+        <div class="ab-label">What I'm Looking For</div>
+        <p class="ab-text">A role where the work matters and the stakes are real. <strong>Chief of Staff, Founder's Office, Revenue Operations, or Strategy Lead</strong> inside a company that's building something worth building. Bengaluru, Chennai, remote, or relocation — wherever the opportunity is right.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     EXPERIENCE
+════════════════════════════════════ -->
+<section class="snap free" id="s2">
+  <h2 class="work-title rev">Work <em>History</em></h2>
+  <div class="timeline">
+
+    <div class="ti rev">
+      <div class="ti-period">Feb 2025 — Present</div>
+      <div class="ti-role">Revenue &amp; Business Operations Manager</div>
+      <div class="ti-co">Proxelera · Bengaluru</div>
+      <ul class="ti-pts">
+        <li>Own end-to-end <strong>revenue operations and business process design</strong> — pipeline governance to deal closure frameworks, ensuring no revenue motion is left to chance</li>
+        <li>Designed and deployed <strong>contract and NDA management workflows</strong> from scratch, cutting review turnaround and closing legal exposure gaps</li>
+        <li>Leading <strong>ISO 27001 compliance implementation</strong> — policy creation, risk registers, asset inventories, audit preparation, and staff training programmes</li>
+        <li>Architected and shipped <strong>HR and Talent Acquisition SOPs</strong> end-to-end, enabling scale without founders bottlenecking every hire</li>
+        <li>Established <strong>vendor compliance and onboarding frameworks</strong> with standardised due diligence, SLA governance, and review cadences</li>
+        <li>Deployed <strong>AI tools across operations, sales, and admin teams</strong> — measurably reducing manual effort and compressing execution timelines</li>
+        <li>Built <strong>legal risk advisory processes</strong> and internal compliance communication frameworks</li>
+        <li>Acts as <strong>Founder's Office and Chief of Staff function</strong> — operating in direct proximity to leadership on strategic priorities</li>
+      </ul>
+    </div>
+
+    <div class="ti rev d1">
+      <div class="ti-period">Apr 2021 — Feb 2025 · 4 years</div>
+      <div class="ti-role">Strategy &amp; Revenue Operations Manager</div>
+      <div class="ti-co">ISFC · Fintech · Bengaluru</div>
+      <ul class="ti-pts">
+        <li>Key contributor to a <strong>120% revenue growth trajectory</strong> — owned pipeline management, forecasting, and deal operations that connected strategy to commercial outcomes</li>
+        <li>Designed, built, and deployed a <strong>fully custom CRM on Airtable from scratch</strong> — lead management, deal tracking, renewals, and revenue reporting across the full lifecycle</li>
+        <li>Worked directly alongside the <strong>CEO and Board</strong> on strategic planning, quarterly business reviews, and investor-facing reporting</li>
+        <li>Led <strong>enterprise deal operations</strong> — structured proposals, coordinated multi-stakeholder negotiations, managed contract execution, and accelerated deal velocity</li>
+        <li>Designed and ran <strong>upsell and cross-sell programmes</strong> — drove systematic revenue expansion beyond acquisition</li>
+        <li>Built <strong>churn reduction infrastructure</strong> — health score models, early warning dashboards, and intervention playbooks that reduced voluntary churn quarter-over-quarter</li>
+        <li>Managed <strong>partner and channel operations</strong> — onboarding, commission frameworks, pipeline tracking, and performance reviews</li>
+        <li>Delivered <strong>performance analytics and BI</strong> using SQL, Python, and Tableau for leadership and board consumption</li>
+        <li>Scoped and initiated <strong>international market expansion</strong> — competitive research, partnership frameworks, and GTM plans for new geographies</li>
+        <li>Led <strong>cross-functional alignment</strong> between sales, finance, product, and operations</li>
+        <li>Championed <strong>digital tools and workflow automation</strong> adoption across business units</li>
+      </ul>
+    </div>
+
+    <div class="ti rev d2">
+      <div class="ti-period">Dec 2020 — Mar 2021</div>
+      <div class="ti-role">Management Trainee</div>
+      <div class="ti-co">Kidex</div>
+      <ul class="ti-pts">
+        <li>Rotational exposure to <strong>business operations, stakeholder coordination, and process documentation</strong></li>
+        <li>Built early foundations in <strong>structured problem-solving and operational execution</strong></li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     SKILLS + TOOLS + CERTS
+════════════════════════════════════ -->
+<section class="snap free" id="s3">
+  <h2 class="skills-title rev">Skills &amp; <em>Expertise</em></h2>
+
+  <div class="smain">
+    <div class="scat rev">
+      <div class="scn">Revenue &amp; Strategy</div>
+      <div class="spills">
+        <span class="sp">Revenue Operations</span>
+        <span class="sp">Sales Operations</span>
+        <span class="sp">Pipeline Management</span>
+        <span class="sp">Revenue Forecasting</span>
+        <span class="sp">Deal Operations</span>
+        <span class="sp">Go-to-Market Strategy</span>
+        <span class="sp">Upsell &amp; Cross-sell</span>
+        <span class="sp">Churn Reduction</span>
+        <span class="sp">Enterprise Deals</span>
+        <span class="sp">0-1 International Expansion</span>
+        <span class="sp">Partnership &amp; Channel Ops</span>
+        <span class="sp">Board &amp; Investor Reporting</span>
+        <span class="sp">Revenue Intelligence</span>
+        <span class="sp">Customer Health Scoring</span>
+      </div>
+    </div>
+    <div class="scat rev d1">
+      <div class="scn">Operations &amp; Leadership</div>
+      <div class="spills">
+        <span class="sp">Chief of Staff</span>
+        <span class="sp">Founder's Office</span>
+        <span class="sp">Business Process Design</span>
+        <span class="sp">SOP Development</span>
+        <span class="sp">Vendor Management</span>
+        <span class="sp">Contract &amp; NDA Management</span>
+        <span class="sp">ISO 27001 Implementation</span>
+        <span class="sp">Legal Risk Advisory</span>
+        <span class="sp">HR &amp; TA Operations</span>
+        <span class="sp">Agile / Scrum</span>
+        <span class="sp">Stakeholder Management</span>
+        <span class="sp">Cross-functional Leadership</span>
+        <span class="sp">Compliance Frameworks</span>
+        <span class="sp">Org Design</span>
+      </div>
+    </div>
+    <div class="scat rev d1">
+      <div class="scn">Data &amp; Analytics</div>
+      <div class="spills">
+        <span class="sp">SQL</span>
+        <span class="sp">Python</span>
+        <span class="sp">R</span>
+        <span class="sp">SPSS</span>
+        <span class="sp">Tableau</span>
+        <span class="sp">Business Analytics</span>
+        <span class="sp">Dashboard Design</span>
+        <span class="sp">Revenue Attribution</span>
+        <span class="sp">Cohort Analysis</span>
+        <span class="sp">Churn Modelling</span>
+        <span class="sp">Performance Reporting</span>
+      </div>
+    </div>
+    <div class="scat rev d2">
+      <div class="scn">Tools &amp; Platforms</div>
+      <div class="spills">
+        <span class="sp">Airtable (Custom CRM Build)</span>
+        <span class="sp">Zoho CRM</span>
+        <span class="sp">Shopify</span>
+        <span class="sp">AI Workflow Design</span>
+        <span class="sp">Prompt Engineering</span>
+        <span class="sp">Google Workspace</span>
+        <span class="sp">Notion</span>
+        <span class="sp">Slack</span>
+        <span class="sp">Project Management Tools</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tools-sec rev d2">
+    <div class="label-tag" style="margin-bottom:1.4rem">Tech Stack</div>
+    <div class="tgrid">
+      <div class="tcard"><div class="tname">SQL</div><div class="ttype">Data Querying</div></div>
+      <div class="tcard"><div class="tname">Python</div><div class="ttype">Analytics &amp; Automation</div></div>
+      <div class="tcard"><div class="tname">R &amp; SPSS</div><div class="ttype">Statistical Analysis</div></div>
+      <div class="tcard"><div class="tname">Tableau</div><div class="ttype">Data Visualisation</div></div>
+      <div class="tcard"><div class="tname">Airtable</div><div class="ttype">Custom CRM Builder</div></div>
+      <div class="tcard"><div class="tname">Zoho CRM</div><div class="ttype">CRM Platform</div></div>
+      <div class="tcard"><div class="tname">Shopify</div><div class="ttype">Commerce Operations</div></div>
+      <div class="tcard"><div class="tname">AI Tools</div><div class="ttype">Workflow Automation</div></div>
+    </div>
+  </div>
+
+  <div class="certs-sec rev d3">
+    <div class="label-tag" style="margin-bottom:1.4rem">Certifications &amp; Education</div>
+    <div class="cgrid">
+      <div class="ccard"><div class="cico">🗂️</div><div><div class="cname">Google Project Management</div><div class="cby">Google / Coursera</div></div></div>
+      <div class="ccard"><div class="cico">⚡</div><div><div class="cname">Certified Agile Practitioner</div><div class="cby">PMI</div></div></div>
+      <div class="ccard"><div class="cico">🔐</div><div><div class="cname">ISO 27001 Lead Implementer</div><div class="cby">Information Security</div></div></div>
+      <div class="ccard"><div class="cico">🎓</div><div><div class="cname">MBA — Business Analytics</div><div class="cby">Lovely Professional University</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     CONTACT
+════════════════════════════════════ -->
+<section class="snap" id="s4">
+  <div class="cta-tag rev">Open to Engagement</div>
+  <h2 class="cta-title rev d1">Let's build<br><em>together.</em></h2>
+  <p class="cta-sub rev d2">
+    Whether you need a <strong>Chief of Staff, a Revenue Operator, or someone to design the system</strong> that makes your next phase of growth possible — I'm ready to talk.
+  </p>
+  <div class="cta-btns rev d3">
+    <a href="mailto:kethakumarasriram@gmail.com" class="btn primary">Email Me ↗</a>
+    <a href="https://linkedin.com/in/kumara-sriram-3b14081b4/" target="_blank" class="btn ghost">LinkedIn</a>
+    <a href="#" class="btn ghost">Download Resume</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Ketha Kumara Sriram &nbsp;·&nbsp; Bengaluru, India</p>
+  <p>Available for <span>Strategy &nbsp;·&nbsp; RevOps &nbsp;·&nbsp; Chief of Staff</span></p>
+</footer>
+
+<!-- ════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════ -->
+<script>
+/* ── THEME ── */
+const html=document.documentElement,tbtn=document.getElementById('tbtn');
+const saved=localStorage.getItem('kks-theme')||'dark';
+html.setAttribute('data-theme',saved);
+tbtn.addEventListener('click',()=>{
+  const n=html.getAttribute('data-theme')==='dark'?'light':'dark';
+  html.setAttribute('data-theme',n);
+  localStorage.setItem('kks-theme',n);
+});
+
+/* ── CURSOR ── */
+const hasMouse=window.matchMedia('(hover:hover)').matches;
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=0,my=0,rx=0,ry=0;
+if(hasMouse){
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cur.style.transform=`translate(${mx-4}px,${my-4}px)`;
+  });
+  (function lc(){
+    rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+    cur2.style.transform=`translate(${rx-15}px,${ry-15}px)`;
+    requestAnimationFrame(lc);
+  })();
+  document.querySelectorAll('a,button,.sp,.stat,.bc,.pg,.ti,.tcard,.ccard,.oc').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='14px';cur.style.height='14px';});
+    el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';});
+  });
+}
+
+/* ── NAV SCROLL ── */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60),{passive:true});
+
+/* ── CANVAS (dark mode particles + flows) ── */
+const cv=document.getElementById('c'),cx=cv.getContext('2d');
+let W,H;
+function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+rsz();window.addEventListener('resize',rsz,{passive:true});
+
+// Slightly warm tones matching the gold/MBB palette
+const COLS=[[201,169,110],[110,201,164],[176,156,208],[112,180,216]];
+
+class Pt{
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;this.z=Math.random()*900+100;
+    this.vx=(Math.random()-.5)*.45;this.vy=(Math.random()-.5)*.45;this.vz=-.65-Math.random()*.55;
+    this.c=COLS[Math.floor(Math.random()*COLS.length)];
+    this.r=.4+Math.random()*1.6;this.a=0;this.ta=.2+Math.random()*.5;
+  }
+  constructor(){this.reset();}
+  tick(){
+    this.x+=this.vx;this.y+=this.vy;this.z+=this.vz;
+    this.a=Math.min(this.ta,this.a+.009);
+    if(this.z<1||this.x<-80||this.x>W+80||this.y<-80||this.y>H+80)this.reset();
+  }
+  draw(){
+    const s=500/(this.z+500),px=(this.x-W/2)*s+W/2,py=(this.y-H/2)*s+H/2;
+    cx.beginPath();cx.arc(px,py,this.r*s,0,Math.PI*2);
+    cx.fillStyle=`rgba(${this.c[0]},${this.c[1]},${this.c[2]},${this.a*s})`;cx.fill();
+  }
+}
+class Fl{
+  reset(){
+    this.pts=[];this.x=Math.random()*W;this.y=Math.random()*H;this.z=450+Math.random()*350;
+    this.vx=(Math.random()-.5)*2;this.vy=(Math.random()-.5)*2;this.vz=-.75-Math.random()*.75;
+    this.len=50+Math.floor(Math.random()*70);
+    this.c=COLS[Math.floor(Math.random()*COLS.length)];
+  }
+  constructor(){this.reset();}
+  tick(){
+    this.x+=this.vx;this.y+=this.vy;this.z+=this.vz;
+    const s=500/(this.z+500),px=(this.x-W/2)*s+W/2,py=(this.y-H/2)*s+H/2;
+    this.pts.push({px,py,s});
+    if(this.pts.length>this.len)this.pts.shift();
+    if(this.z<1||this.x<-350||this.x>W+350||this.y<-350||this.y>H+350)this.reset();
+  }
+  draw(){
+    if(this.pts.length<2)return;
+    cx.beginPath();cx.moveTo(this.pts[0].px,this.pts[0].py);
+    for(let i=1;i<this.pts.length;i++)cx.lineTo(this.pts[i].px,this.pts[i].py);
+    const ls=this.pts[this.pts.length-1].s;
+    cx.strokeStyle=`rgba(${this.c[0]},${this.c[1]},${this.c[2]},${Math.min(ls*.2,.17)})`;
+    cx.lineWidth=ls*.7;cx.stroke();
+  }
+}
+const parts=Array.from({length:150},()=>new Pt());
+const flows=Array.from({length:50},()=>new Fl());
+let mouse={x:W/2,y:H/2};
+document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;},{passive:true});
+(function render(){
+  cx.clearRect(0,0,W,H);
+  const g=cx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,260);
+  g.addColorStop(0,'rgba(201,169,110,0.04)');g.addColorStop(1,'transparent');
+  cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  flows.forEach(f=>{f.tick();f.draw();});
+  parts.forEach(p=>{p.tick();p.draw();});
+  requestAnimationFrame(render);
+})();
+
+/* ── REVEAL ── */
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');});
+},{threshold:.08});
+document.querySelectorAll('.rev').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>
